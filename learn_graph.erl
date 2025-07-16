@@ -43,7 +43,7 @@ loop(Neighbours, KProc, KChan) ->
     io:format("~p is knowing ~p Kproc and ~p Kchan~n", [self(), KProc, KChan]),
     case all(fun({Na, Nb}) -> member(Na, KProc) and member(Nb, KProc) end, KChan) of
 	true ->
-	    io:format("Done!~n"),
+	    io:format("~p Done!~n", [self()]),
 	    done;
 	false ->
 	    receive
