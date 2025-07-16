@@ -41,27 +41,26 @@ make_first_contact(Neighbours) ->
     
 loop(Neighbours, KProc, KChan) ->
     io:format("~p is knowing ~p Kproc and ~p Kchan~n", [self(), KProc, KChan]),
-    Done = all(fun({Na, Nb}) -> member(Na, KProc) and member(Nb, KProc) end, KChan),
-    if Done ->
+    case all(fun({Na, Nb}) -> member(Na, KProc) and member(Nb, KProc) end, KChan) of
+	true ->
 	    io:format("Done!~n"),
 	    finished_node();
-       true ->
-	    ok % keep going
-    end,
+	false ->
+	    receive
+		{Who, position, HisNeighbours} ->
+		    io:format("~p received pos from ~p!~n", [self(), Who]),
 
-    receive
-	{Who, position, HisNeighbours} ->
-	    io:format("~p received pos from ~p!~n", [self(), Who]),
-	    
-	    Member = member(Who, KProc),
-	    if not Member ->
-		    map(fun % todo itself
-			   (Other) -> Other ! {Who, position, HisNeighbours} end, Neighbours), % repassa o conhecimento aos vizinhos
-		    loop(Neighbours, [Who|KProc], ordsets:union(KChan, chan_set(Who, HisNeighbours)));
-	       true -> ok % keep going
-	    end,
-	    loop(Neighbours, KProc, KChan)
+		    case member(Who, KProc) of
+			true -> 
+			    loop(Neighbours, KProc, KChan);
+			false ->
+			    map(fun % todo itself
+				    (Other) -> Other ! {Who, position, HisNeighbours} end, Neighbours), % repassa o conhecimento aos vizinhos
+			    loop(Neighbours, [Who|KProc], ordsets:union(KChan, chan_set(Who, HisNeighbours)))
+		    end
+	    end
     end.
+
 
 finished_node() ->
     finished_node(). % how to stop?
