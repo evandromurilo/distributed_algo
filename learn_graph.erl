@@ -1,7 +1,7 @@
 -module(learn_graph).
 -moduledoc "Um algoritmo para que nodes conheçam o grafo inteiro".
 -export([demo/0, unitialized_node/0]).
--import(lists, [map/2, member/2, all/2]).
+-import(lists, [map/2, filter/2, member/2, all/2]).
 
 demo() ->
     A = spawn(learn_graph, unitialized_node, []),
@@ -33,7 +33,6 @@ nonstarted_node(Neighbours, KProc, KChan) ->
 	    self() ! Pos
     end,
     loop(Neighbours, KProc, KChan).
-
 	
 make_first_contact(Neighbours) ->
     io:format("First contact of ~p with ~p!~n", [self(), Neighbours]),
@@ -54,13 +53,12 @@ loop(Neighbours, KProc, KChan) ->
 			true -> 
 			    loop(Neighbours, KProc, KChan);
 			false ->
-			    map(fun % todo itself
-				    (Other) -> Other ! {Who, position, HisNeighbours} end, Neighbours), % repassa o conhecimento aos vizinhos
+			    SendTo = filter(fun (Proc) -> not(Proc =:= Who) end, Neighbours), % se Who for meu vizinho, removo da lista
+			    map(fun (Proc) -> Proc ! {Who, position, HisNeighbours} end, SendTo), % repassa o conhecimento aos vizinhos
 			    loop(Neighbours, [Who|KProc], ordsets:union(KChan, chan_set(Who, HisNeighbours)))
 		    end
 	    end
     end.
-
 
 finished_node() ->
     finished_node(). % how to stop?
