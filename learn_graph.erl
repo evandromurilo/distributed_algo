@@ -1,6 +1,6 @@
 -module(learn_graph).
 -moduledoc "Um algoritmo para que nodes conheçam o grafo inteiro".
--export([demo/0, unitialized_node/0, chan_zip/2]).
+-export([demo/0, unitialized_node/0]).
 -import(lists, [map/2, member/2, all/2]).
 
 demo() ->
@@ -18,7 +18,7 @@ demo() ->
 unitialized_node() ->
     receive
 	{neighbours, Neighbours} ->
-	    KChan = chan_zip(self(), Neighbours),
+	    KChan = chan_set(self(), Neighbours),
 	    initialized_node(false, Neighbours, [self()], KChan)
     end.
 
@@ -56,7 +56,7 @@ initialized_node(Started, Neighbours, KProc, KChan) ->
 	    if not Member ->
 		    map(fun % todo itself
 			   (Other) -> Other ! {Who, position, HisNeighbours} end, Neighbours), % repassa o conhecimento aos vizinhos
-		    initialized_node(true, Neighbours, [Who|KProc], KChan ++ chan_zip(Who, HisNeighbours));
+		    initialized_node(true, Neighbours, [Who|KProc], ordsets:union(KChan, chan_set(Who, HisNeighbours)));
 	       true -> ok % keep going
 	    end,
 	    initialized_node(true, Neighbours, KProc, KChan)
@@ -68,8 +68,8 @@ finished_node() ->
 s_zip(S, L) ->
     [{S, X} || X <- L].
 
-chan_zip(S, L) ->
-    map(fun ({Pa, Pb}) -> chan(Pa, Pb) end, s_zip(S, L)).
+chan_set(S, L) ->
+    ordsets:from_list(map(fun ({Pa, Pb}) -> chan(Pa, Pb) end, s_zip(S, L))).
 		
 
 -doc "Representação canônica de um canal (apenas o par Pa, Pb ordenado)".
