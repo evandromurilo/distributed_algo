@@ -62,7 +62,7 @@ loop(Neighbours, KProc, KChan) ->
     end.
 
 finished_node() ->
-    finished_node(). % how to stop?
+    finished.
 
 % Representação canônica de um conjunto de canais
 chan_set(S, L) ->
