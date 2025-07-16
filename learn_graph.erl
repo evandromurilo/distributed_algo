@@ -41,6 +41,10 @@ make_first_contact(Neighbours) ->
     
 loop(Neighbours, KProc, KChan) ->
     io:format("~p is knowing ~p Kproc and ~p Kchan~n", [self(), KProc, KChan]),
+    % aqui reside a chave do algoritmo: como existe um caminho entre quaisquer duas nodes,
+    % e eu só recebo informações dos meus vizinhos (e meus vizinhos dos vizinhos deles),
+    % então necessariamente eu vou saber da existência de uma node (KChan) antes de saber sua posição (KProc),
+    % logo, o algoritmo para quando eu conheço a posição de todas as nodes em KChan
     case all(fun({Na, Nb}) -> member(Na, KProc) and member(Nb, KProc) end, KChan) of
 	true ->
 	    io:format("~p Done!~n", [self()]),
