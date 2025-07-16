@@ -1,5 +1,5 @@
 -module(learn_graph).
--moduledoc "Um algoritmo para que nodes conheçam o grafo inteiro".
+-moduledoc "Um algoritmo para que nodes interconectadas descubram todas as posições no grafo".
 -export([demo/0, unitialized_node/0]).
 -import(lists, [map/2, filter/2, member/2, all/2]).
 
@@ -24,6 +24,7 @@ unitialized_node() ->
 	    nonstarted_node(Neighbours, [self()], KChan)
     end.
 
+% na primeira mensagem que receber após neighbours, faz primeiro contato
 nonstarted_node(Neighbours, KProc, KChan) ->
     receive
 	start ->
@@ -63,9 +64,10 @@ loop(Neighbours, KProc, KChan) ->
 finished_node() ->
     finished_node(). % how to stop?
 
+% Representação canônica de um conjunto de canais
 chan_set(S, L) ->
     ordsets:from_list([chan(S, X) || X <- L]).
 
--doc "Representação canônica de um canal (apenas o par Pa, Pb ordenado)".
+% Representação canônica de um canal (apenas o par Pa, Pb ordenado)
 chan(Pa, Pb) ->
     {min(Pa, Pb), max(Pa, Pb)}.
