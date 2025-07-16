@@ -8,10 +8,12 @@ demo() ->
     B = spawn(learn_graph, unitialized_node, []),
     C = spawn(learn_graph, unitialized_node, []),
     D = spawn(learn_graph, unitialized_node, []),
+    E = spawn(learn_graph, unitialized_node, []),
     A ! {neighbours, [B, C]},
     B ! {neighbours, [A, D]},
     C ! {neighbours, [A]},
-    D ! {neighbours, [B]},
+    D ! {neighbours, [B, E]},
+    E ! {neighbours, [B]},
     A ! start.
 
 % primeiro a node espera para conhecer sua posição (seus vizinhos)
@@ -65,12 +67,8 @@ initialized_node(Started, Neighbours, KProc, KChan) ->
 finished_node() ->
     finished_node(). % how to stop?
 
-s_zip(S, L) ->
-    [{S, X} || X <- L].
-
 chan_set(S, L) ->
-    ordsets:from_list(map(fun ({Pa, Pb}) -> chan(Pa, Pb) end, s_zip(S, L))).
-		
+    ordsets:from_list([chan(S, X) || X <- L]).
 
 -doc "Representação canônica de um canal (apenas o par Pa, Pb ordenado)".
 chan(Pa, Pb) ->
