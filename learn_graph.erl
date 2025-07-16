@@ -44,7 +44,7 @@ loop(Neighbours, KProc, KChan) ->
     case all(fun({Na, Nb}) -> member(Na, KProc) and member(Nb, KProc) end, KChan) of
 	true ->
 	    io:format("Done!~n"),
-	    finished_node();
+	    done;
 	false ->
 	    receive
 		{Who, position, HisNeighbours} ->
@@ -60,9 +60,6 @@ loop(Neighbours, KProc, KChan) ->
 		    end
 	    end
     end.
-
-finished_node() ->
-    finished.
 
 % Representação canônica de um conjunto de canais
 chan_set(S, L) ->
