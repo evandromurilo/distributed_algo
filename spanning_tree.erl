@@ -1,5 +1,5 @@
 -module(spanning_tree).
--moduledoc "Builds a spanning tree rooted at 'Pa' that can be reused for broadcast and convergecast"
+-moduledoc "Builds a spanning tree rooted at 'Pa' that can be reused for broadcast and convergecast".
 -export([demo/0, waiting_node/1]).
 
 demo() ->
