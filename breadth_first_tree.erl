@@ -1,7 +1,7 @@
 -module(breadth_first_tree).
 -moduledoc "Builds a breadth-first tree without centralized control that can then be used for broadcast and convergecast".
 -export([demo/0, waiting_node/1]).
--import(lists, [map/2]).
+-import(lists, [foreach/2]).
 
 demo() ->
     A = spawn(breadth_first_tree, waiting_node, [2]),
@@ -132,11 +132,11 @@ collecting_node(Val, Parent, Children, Collected, WaitingCount) ->
 send_hello(Others, Level, Except) ->
     send_hello(ordsets:del_element(Except, Others), Level).
 send_hello(Others, Level) ->
-    map(fun (Pid) -> Pid ! {hello, self(), Level} end, Others).
+    foreach(fun (Pid) -> Pid ! {hello, self(), Level} end, Others).
 		
 send_finishing(Others) ->
-    map(fun (Pid) -> Pid ! finishing end, Others).
+    foreach(fun (Pid) -> Pid ! finishing end, Others).
 
 send_collect(Others) ->
-    map(fun (Pid) -> Pid ! collect end, Others).
+    foreach(fun (Pid) -> Pid ! collect end, Others).
 		
