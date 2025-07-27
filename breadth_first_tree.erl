@@ -80,7 +80,7 @@ undecided_node(Val, Parent, Level, Neighbours, Children, 0) ->
 undecided_node(Val, Parent, Level, Neighbours, Children, WaitingCount) ->
     receive
 	{hello, NewParent, NewLevel} when NewLevel+1 < Level ->
-	    send_hello(Neighbours, NewLevel+1),
+	    send_hello(Neighbours, NewLevel+1, NewParent),
 	    undecided_node(Val, NewParent, NewLevel+1, Neighbours, [], ordsets:size(Neighbours)-1);
 	{hello, WorseParent, WorseLevel} ->
 	    WorseParent ! {back, self(), no, WorseLevel+1},
@@ -94,7 +94,7 @@ undecided_node(Val, Parent, Level, Neighbours, Children, WaitingCount) ->
 decided_node(Val, Parent, Level, Neighbours, Children) ->
     receive
 	{hello, NewParent, NewLevel} when NewLevel+1 < Level ->
-	    send_hello(Neighbours, NewLevel+1),
+	    send_hello(Neighbours, NewLevel+1, NewParent),
 	    undecided_node(Val, NewParent, NewLevel+1, Neighbours, [], ordsets:size(Neighbours)-1);
 	{hello, WorseParent, WorseLevel} ->
 	    WorseParent ! {back, self(), no, WorseLevel+1};
